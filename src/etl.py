@@ -31,4 +31,23 @@ def fetch():
         "temp": data["main"]["temp"],
         "humidity": data["main"]["humidity"]
     }
+def transform(record):
+    """
+    Placeholder pour nettoyer ou enrichir le record.
+    Actuellement, on renvoie simplement ce qu'on reçoit.
+    """
+    return record
+
+def load(record):
+    """
+    Insère le record dans la table meteo (mode append).
+    """
+    # 1. Connexion à la base
+    conn = sqlite3.connect(DB_PATH)
+    # 2. Conversion en DataFrame et insertion
+    df = pd.DataFrame([record])
+    df.to_sql("meteo", conn, if_exists="append", index=False)
+    # 3. Fermeture
+    conn.close()
+
     
