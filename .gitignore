@@ -1,0 +1,12 @@
+# Fichiers Python compilés
+__pycache__/
+*.pyc
+
+# Environnement virtuel
+venv/
+
+# Base SQLite générée
+data/*.db
+
+# Logs et fichiers temporaires
+*.log
