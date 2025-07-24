@@ -19,8 +19,8 @@ def init_db():
     """)
     # 3. Enregistrement et fermeture
     conn.commit()
-    conn.close()
-    def fetch():
+   
+def fetch():
     params = {"q": CITY, "appid": API_KEY, "units": "metric"}
     response = requests.get(URL, params=params)
     response.raise_for_status()
@@ -30,3 +30,4 @@ def init_db():
         "temp": data["main"]["temp"],
         "humidity": data["main"]["humidity"]
     }
+    
