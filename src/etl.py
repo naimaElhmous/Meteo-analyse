@@ -2,7 +2,8 @@ import requests
 import sqlite3
 import pandas as pd
 from datetime import datetime
-from config import API_KEY, CITY, URL, DB_PATH
+from src.config import API_KEY, CITY, URL, DB_PATH
+
 def init_db():
     """
     Crée la table meteo dans la base SQLite si elle n'existe pas.
