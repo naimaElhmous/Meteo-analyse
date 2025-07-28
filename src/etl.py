@@ -43,8 +43,25 @@ def fetch():
     }
 
 def transform(record):
-    # Ici tu peux ajouter du nettoyage ou enrichissement si besoin
+    """
+    Nettoyer et enrichir le record avec des champs supplémentaires.
+    """
+    # Ajout d'une colonne 'date' uniquement (format YYYY-MM-DD)
+    record['date'] = record['timestamp'].date()
+
+    # Exemple de catégorisation météo simple à partir de la description
+    desc = record.get('description', '').lower()
+    if "rain" in desc:
+        record['weather_type'] = 'rain'
+    elif "cloud" in desc:
+        record['weather_type'] = 'cloudy'
+    elif "clear" in desc:
+        record['weather_type'] = 'clear'
+    else:
+        record['weather_type'] = 'other'
+
     return record
+
 
 def load(record):
     conn = sqlite3.connect(DB_PATH)
