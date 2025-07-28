@@ -8,46 +8,53 @@ def init_db():
     """
     Crée la table meteo dans la base SQLite si elle n'existe pas.
     """
-    # 1. Connexion (ouvre ou crée le fichier DB)
     conn = sqlite3.connect(DB_PATH)
-    # 2. Exécution du DDL pour créer la table si besoin
     conn.execute("""
-      CREATE TABLE IF NOT EXISTS meteo (
-        timestamp DATETIME,
+    CREATE TABLE IF NOT EXISTS meteo (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        city TEXT NOT NULL,
+        timestamp DATETIME NOT NULL,
         temp REAL,
-        humidity INTEGER
-      )
+        humidity INTEGER,
+        pressure INTEGER,
+        wind_speed REAL,
+        wind_deg INTEGER,
+        description TEXT
+    )
     """)
-    # 3. Enregistrement et fermeture
     conn.commit()
-   
+    conn.close()
+
 def fetch():
     params = {"q": CITY, "appid": API_KEY, "units": "metric"}
     response = requests.get(URL, params=params)
     response.raise_for_status()
     data = response.json()
+
     return {
+        "city": CITY,
         "timestamp": datetime.utcfromtimestamp(data["dt"]),
         "temp": data["main"]["temp"],
-        "humidity": data["main"]["humidity"]
+        "humidity": data["main"]["humidity"],
+        "pressure": data["main"].get("pressure"),
+        "wind_speed": data.get("wind", {}).get("speed"),
+        "wind_deg": data.get("wind", {}).get("deg"),
+        "description": data["weather"][0]["description"] if data.get("weather") else None
     }
+
 def transform(record):
-    """
-    Placeholder pour nettoyer ou enrichir le record.
-    Actuellement, on renvoie simplement ce qu'on reçoit.
-    """
+    # Ici tu peux ajouter du nettoyage ou enrichissement si besoin
     return record
 
 def load(record):
-    """
-    Insère le record dans la table meteo (mode append).
-    """
-    # 1. Connexion à la base
     conn = sqlite3.connect(DB_PATH)
-    # 2. Conversion en DataFrame et insertion
     df = pd.DataFrame([record])
     df.to_sql("meteo", conn, if_exists="append", index=False)
-    # 3. Fermeture
     conn.close()
 
-    
+if __name__ == "__main__":
+    init_db()
+    record = fetch()
+    clean = transform(record)
+    load(clean)
+    print("✔ Donnée insérée :", clean)
